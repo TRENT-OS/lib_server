@@ -10,13 +10,19 @@
 #pragma once
 
 #include "OS_Error.h"
+#include "lib_util/PointerVector.h"
 
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef void* const HandleMgr_Handle_t;
-typedef struct HandleMgr HandleMgr_t;
+typedef Pointer HandleMgr_Handle_t;
+
+typedef struct HandleMgr
+{
+    PointerVector vector;
+}
+HandleMgr_t;
 
 #define HandleMgr_GET_SIZE_BY_CAPACITY(capacity)\
     PointerVector_GET_SIZE_BY_CAPACITY(capacity)
@@ -27,23 +33,33 @@ typedef struct HandleMgr HandleMgr_t;
  * Initialize a handle manager instance with a set of handle manager lists,
  * to which handles can be added/removed.
  *
- * @param mgr (required) pointer to handle manager
- * @param num (required) number of different handle types
+ * @param self (required) pointer to handle manager
+ * @param buffer (required) memory buffer to store handles
+ * @param bufSize (required) memory buffer to store handles
+ * @param capacityNumHandles capacity in number of elements. This is an
+ * input/output parameter. If NULL then it is simply ignored, otherwise the
+ * init will check the required number of elements against the size of the
+ * memory buffer. If the memory is not sufficient then
+ *  OS_ERROR_INSUFFICIENT_SPACE will be returned otherwise the maximum capacity
+ * of the container beneath will be returned.
  *
  * @return an error code
  * @retval OS_SUCCESS if operation succeeded
  * @retval OS_ERROR_INVALID_PARAMETER if a parameter was missing or invalid
- * @retval OS_ERROR_INSUFFICIENT_SPACE if an allocation failed
+ * @retval OS_ERROR_INSUFFICIENT_SPACE if the required amount of handles results
+ * in a greater need of memory (than the one passed).
  */
 OS_Error_t
 HandleMgr_init(
-    HandleMgr_t** mgr,
-    const size_t  num);
+    HandleMgr_t* self,
+    void* buffer,
+    size_t bufSize,
+    size_t* capacityNumHandles);
 
 /**
  * @brief Free a handle manager instance
  *
- * @param mgr (required) handle manager
+ * @param self (required) handle manager
  *
  * @return an error code
  * @retval OS_SUCCESS if operation succeeded
@@ -51,13 +67,12 @@ HandleMgr_init(
  */
 OS_Error_t
 HandleMgr_free(
-    HandleMgr_t* mgr);
+    HandleMgr_t* self);
 
 /**
  * @brief Add handle to manager
  *
- * @param mgr (required) handle manager
- * @param id  (required) id of handle
+ * @param self (required) handle manager
  * @param handle (required) handle
  *
  * @return an error code
@@ -67,8 +82,7 @@ HandleMgr_free(
  */
 OS_Error_t
 HandleMgr_add(
-    HandleMgr_t* const mgr,
-    const size_t       id,
+    HandleMgr_t* self,
     HandleMgr_Handle_t handle);
 
 /**
@@ -89,7 +103,6 @@ HandleMgr_add(
  * OS_CryptoKey_Handle_t keyHandle;
  * err = HandleMgr_addOnSuccess(
  *          handleMgr,
- *          HND_KEY,
  *          OS_CryptoKey_import(
  *              &keyHandle,
  *              hCrypto,
@@ -97,8 +110,7 @@ HandleMgr_add(
  *          (HandleMgr_Handle_t*) &keyHandle);
  * \endcode
  *
- * @param mgr (required) handle manager
- * @param id  (required) id of handle
+ * @param self (required) handle manager
  * @param ret (required) error code of outer function
  * @param handle (required) pointer to handle
  *
@@ -110,13 +122,12 @@ HandleMgr_add(
 __attribute__((unused))
 static OS_Error_t
 HandleMgr_addOnSuccess(
-    HandleMgr_t* const  mgr,
-    const size_t        id,
+    HandleMgr_t*        self,
     const OS_Error_t    ret,
     HandleMgr_Handle_t* handle)
 {
     return (NULL == handle)    ? OS_ERROR_INVALID_PARAMETER :
-           (OS_SUCCESS == ret) ? HandleMgr_add(mgr, id, *handle) : ret;
+           (OS_SUCCESS == ret) ? HandleMgr_add(self, *handle) : ret;
 }
 
 /**
@@ -132,9 +143,8 @@ HandleMgr_addOnSuccess(
  */
 OS_Error_t
 HandleMgr_remove(
-    HandleMgr_t* const mgr,
-    const size_t       id,
-    HandleMgr_Handle_t handle);
+    HandleMgr_t*        self,
+    HandleMgr_Handle_t  handle);
 
 /**
  * @brief (Conditionally) Remove handle from manager
@@ -144,8 +154,7 @@ HandleMgr_remove(
  * returns the value of \p ret. This allows to "stack" the HandleMgr with other
  * functions (e.g., free() of some object inidcated by the handle).
  *
- * @param mgr (required) handle manager
- * @param id  (required) id of handle
+ * @param self (required) handle manager
  * @param ret (required) error code of outer function
  * @param handle (required) handle
  *
@@ -157,12 +166,11 @@ HandleMgr_remove(
 __attribute__((unused))
 static OS_Error_t
 HandleMgr_removeOnSuccess(
-    HandleMgr_t* const mgr,
-    const size_t       id,
-    const OS_Error_t   ret,
-    HandleMgr_Handle_t handle)
+    HandleMgr_t*        self,
+    const OS_Error_t    ret,
+    HandleMgr_Handle_t  handle)
 {
-    return ret != OS_SUCCESS ? ret : HandleMgr_remove(mgr, id, handle);
+    return ret != OS_SUCCESS ? ret : HandleMgr_remove(self, handle);
 }
 
 /**
@@ -173,7 +181,7 @@ HandleMgr_removeOnSuccess(
  * the handle is NOT in the list, this function returns NULL. This behavior
  * allows to stack this function with other functionality.
  *
- * @param mgr (required) handle manager
+ * @param self (required) handle manager
  * @param id  (required) id of handle
  * @param handle (required) handle
  *
@@ -181,6 +189,5 @@ HandleMgr_removeOnSuccess(
  */
 HandleMgr_Handle_t
 HandleMgr_validate(
-    HandleMgr_t* const mgr,
-    const size_t       id,
+    HandleMgr_t* self,
     HandleMgr_Handle_t handle);

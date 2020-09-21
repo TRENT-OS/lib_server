@@ -3,15 +3,7 @@
  */
 
 #include "lib_server/HandleMgr.h"
-#include "lib_util/PointerVector.h"
-
 #include <string.h>
-
-struct HandleMgr
-{
-    PointerVector* handles;
-    size_t num;
-};
 
 #define HANDLE_NOT_FOUND ((size_t) -1)
 
@@ -38,127 +30,99 @@ find(
 // Public functions ------------------------------------------------------------
 
 OS_Error_t
-HandleMgr_init(
-    HandleMgr_t** mgr,
-    const size_t  num)
+HandleMgr_init(HandleMgr_t* self,
+               void* buffer,
+               size_t bufSize,
+               size_t* capacityNumHandles)
 {
-    OS_Error_t err;
-    HandleMgr_t* self;
-
-    if (NULL == mgr || 0 == num)
+    if (NULL == self || NULL == buffer || 0 == bufSize)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((self = calloc(1, sizeof(HandleMgr_t))) == NULL)
+    size_t myCapacityNumHandles = bufSize / sizeof(HandleMgr_Handle_t);
+    if (capacityNumHandles != NULL &&
+        *capacityNumHandles > myCapacityNumHandles)
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
-    if ((self->handles = calloc(num, sizeof(PointerVector))) == NULL)
+
+    if (!PointerVector_ctorStatic(&self->vector, buffer, myCapacityNumHandles))
     {
-        err = OS_ERROR_INSUFFICIENT_SPACE;
-        goto err0;
+        return OS_ERROR_ABORTED;
     }
 
-    for (size_t i = 0; i < num; i++)
+    if (capacityNumHandles != NULL)
     {
-        if (!PointerVector_ctor(&self->handles[i], 1))
-        {
-            err = OS_ERROR_INSUFFICIENT_SPACE;
-            goto err1;
-        }
+        *capacityNumHandles = myCapacityNumHandles;
     }
-
-    self->num = num;
-
-    *mgr = self;
 
     return OS_SUCCESS;
-
-err1:
-    free(self->handles);
-err0:
-    free(self);
-
-    return err;
 }
 
 OS_Error_t
 HandleMgr_free(
-    HandleMgr_t* mgr)
+    HandleMgr_t* self)
 {
-    if (NULL == mgr)
+    if (NULL == self)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    free(mgr->handles);
-    free(mgr);
+    PointerVector_dtor(&self->vector);
 
     return OS_SUCCESS;
 }
 
 OS_Error_t
 HandleMgr_add(
-    HandleMgr_t* const mgr,
-    const size_t       id,
+    HandleMgr_t* self,
     HandleMgr_Handle_t handle)
 {
-    PointerVector* vec;
-
-    if (NULL == mgr || id >= mgr->num || NULL == handle)
+    if (NULL == self || NULL == handle)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    vec = &mgr->handles[id];
-
-    return !PointerVector_pushBack(vec, handle) ?
+    return !PointerVector_pushBack(&self->vector, handle) ?
            OS_ERROR_INSUFFICIENT_SPACE : OS_SUCCESS;
 }
 
 OS_Error_t
 HandleMgr_remove(
-    HandleMgr_t* const mgr,
-    const size_t       id,
+    HandleMgr_t* self,
     HandleMgr_Handle_t handle)
 {
-    PointerVector* vec;
     size_t idx;
 
-    if (NULL == mgr || id >= mgr->num || NULL == handle)
+    if (NULL == self || NULL == handle)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    vec = &mgr->handles[id];
-
-    if ((idx = find(vec, handle)) ==  HANDLE_NOT_FOUND)
+    if ((idx = find(&self->vector, handle)) ==  HANDLE_NOT_FOUND)
     {
         return OS_ERROR_INVALID_HANDLE;
     }
 
-    PointerVector_replaceElementAt(vec, idx, PointerVector_getBack(vec));
-    PointerVector_popBack(vec);
+    PointerVector_replaceElementAt(&self->vector,
+                                   idx,
+                                   PointerVector_getBack(&self->vector));
+    PointerVector_popBack(&self->vector);
 
     return OS_SUCCESS;
 }
 
 HandleMgr_Handle_t
 HandleMgr_validate(
-    HandleMgr_t* const mgr,
-    const size_t       id,
+    HandleMgr_t* self,
     HandleMgr_Handle_t handle)
 {
-    if (NULL == mgr || id >= mgr->num)
-    {
-        return NULL;
-    }
     // Let NULL pointers simply pass through
-    if (NULL == handle)
+    if (NULL == self || NULL == handle)
     {
         return NULL;
     }
 
-    return find(&mgr->handles[id], handle) != HANDLE_NOT_FOUND ? handle : NULL;
+    return find(&self->vector, handle) != HANDLE_NOT_FOUND ? handle : NULL;
 }
