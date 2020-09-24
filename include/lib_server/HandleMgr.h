@@ -18,6 +18,9 @@
 typedef void* const HandleMgr_Handle_t;
 typedef struct HandleMgr HandleMgr_t;
 
+#define HandleMgr_GET_SIZE_BY_CAPACITY(capacity)\
+    PointerVector_GET_SIZE_BY_CAPACITY(capacity)
+
 /**
  * @brief Initialize a handle manager instance
  *
