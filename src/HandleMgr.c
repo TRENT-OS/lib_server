@@ -84,6 +84,11 @@ HandleMgr_add(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
+    if (find(&self->vector, handle) != HANDLE_NOT_FOUND)
+    {
+        return OS_ERROR_OPERATION_DENIED;
+    }
+
     return !PointerVector_pushBack(&self->vector, handle) ?
            OS_ERROR_INSUFFICIENT_SPACE : OS_SUCCESS;
 }

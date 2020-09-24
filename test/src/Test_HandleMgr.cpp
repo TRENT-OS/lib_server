@@ -66,6 +66,10 @@ TEST(Test_HandleMgr, add_pos)
         ASSERT_EQ((void*) (i + 1),
                   HandleMgr_validate(&hMgr, (HandleMgr_Handle_t) (i + 1)));
     }
+    // test duplicates avoidance
+    ASSERT_EQ(OS_ERROR_OPERATION_DENIED,
+              HandleMgr_add(&hMgr, (HandleMgr_Handle_t) (NUM_HANDLES)));
+    // test limit exceeded
     ASSERT_EQ(OS_ERROR_INSUFFICIENT_SPACE,
               HandleMgr_add(&hMgr, (HandleMgr_Handle_t) (NUM_HANDLES + 1)));
     ASSERT_EQ(OS_SUCCESS, HandleMgr_free(&hMgr));

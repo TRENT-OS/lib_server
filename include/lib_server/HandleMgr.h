@@ -77,6 +77,7 @@ HandleMgr_free(
  *
  * @return an error code
  * @retval OS_SUCCESS if operation succeeded
+ * @retval OS_ERROR_OPERATION_DENIED handle is duplicated
  * @retval OS_ERROR_INVALID_PARAMETER if a parameter was missing or invalid
  * @retval OS_ERROR_INSUFFICIENT_SPACE if an allocation failed
  */
@@ -116,6 +117,7 @@ HandleMgr_add(
  *
  * @return an error code
  * @retval OS_SUCCESS if operation succeeded
+ * @retval OS_ERROR_OPERATION_DENIED handle is duplicated
  * @retval OS_ERROR_INVALID_PARAMETER if a parameter was missing or invalid
  * @retval OS_ERROR_INSUFFICIENT_SPACE if an allocation failed
  */
