@@ -13,6 +13,7 @@ add_library(${PROJECT_NAME} INTERFACE)
 
 target_sources(${PROJECT_NAME}
     INTERFACE
+        "src/ContextMgr.c"
         "src/HandleMgr.c"
 )
 
