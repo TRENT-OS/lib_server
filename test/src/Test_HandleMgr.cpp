@@ -237,9 +237,3 @@ TEST(Test_HandleMgr, validate_pos)
     ASSERT_EQ((void*)0, HandleMgr_validate(&hMgr, (HandleMgr_Handle_t) 1));
     ASSERT_EQ(OS_SUCCESS, HandleMgr_free(&hMgr));
 }
-
-int main(int argc, char* argv[])
-{
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

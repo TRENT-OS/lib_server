@@ -156,9 +156,3 @@ TEST(Test_ContextMgr, get_neg)
 
     ASSERT_EQ(OS_SUCCESS, ContextMgr_free(&hMgr));
 }
-
-int main(int argc, char* argv[])
-{
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
