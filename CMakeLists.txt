@@ -25,6 +25,13 @@ target_include_directories(${PROJECT_NAME}
         "include"
 )
 
+target_link_libraries(${PROJECT_NAME}
+    INTERFACE
+        lib_debug
+        lib_macros
+        lib_util
+)
+
 if (DEBUG_CONFIG_H_FILE)
     target_compile_definitions(${PROJECT_NAME}
         INTERFACE

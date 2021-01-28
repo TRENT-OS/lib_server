@@ -2,6 +2,7 @@
  * Copyright (C) 2020, HENSOLDT Cyber GmbH
  */
 
+#include "lib_debug/Debug.h"
 #include "lib_server/ContextMgr.h"
 #include "lib_macros/Check.h"
 #include "lib_util/PointerVector.h"
