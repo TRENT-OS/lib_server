@@ -26,10 +26,8 @@ target_include_directories(${PROJECT_NAME}
 )
 
 if (DEBUG_CONFIG_H_FILE)
-
     target_compile_definitions(${PROJECT_NAME}
         INTERFACE
             "DEBUG_CONFIG_H_FILE=${DEBUG_CONFIG_H_FILE}"
     )
-
 endif ()
