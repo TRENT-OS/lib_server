@@ -10,7 +10,7 @@
 #pragma once
 
 #include "OS_Error.h"
-#include "lib_util/PointerVector.h"
+#include "lib_utils/PointerVector.h"
 
 #include <stdint.h>
 #include <stddef.h>

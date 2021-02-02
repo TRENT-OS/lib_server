@@ -30,7 +30,7 @@ target_link_libraries(${PROJECT_NAME}
         os_core_api
         lib_debug
         lib_macros
-        lib_util
+        lib_utils
 )
 
 if (DEBUG_CONFIG_H_FILE)
@@ -53,6 +53,6 @@ if (BUILD_TESTING)
             ext_mocks
             lib_debug_mocks
             lib_macros_mocks
-            lib_util_mocks
+            lib_utils_mocks
     )
 endif ()
