@@ -27,6 +27,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
+        os_core_api
         lib_debug
         lib_macros
         lib_util
