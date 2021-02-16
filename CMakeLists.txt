@@ -41,18 +41,8 @@ if (DEBUG_CONFIG_H_FILE)
 endif ()
 
 #-------------------------------------------------------------------------------
-# TESTS
+# TESTING
 #-------------------------------------------------------------------------------
 if (BUILD_TESTING)
-    include("${TEST_MAIN_DIR}/test.cmake")
-    add_test_target(${PROJECT_NAME}
-        SOURCES
-            "test/src/Test_ContextMgr.cpp"
-            "test/src/Test_HandleMgr.cpp"
-        MOCKS
-            ext_mocks
-            lib_debug_mocks
-            lib_macros_mocks
-            lib_utils_mocks
-    )
+    add_subdirectory(test)
 endif ()
