@@ -1,5 +1,5 @@
 #
-# The Server Component Utilities
+# Server Library
 #
 # Copyright (C) 2020, HENSOLDT Cyber GmbH
 #

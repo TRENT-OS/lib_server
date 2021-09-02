@@ -1,4 +1,4 @@
-# The Server Component Utilities
+# Server Library
 
-Utilities related to the components that are acting as a servers are placed
-here.
+The library provides utilities for components that are acting as CAmkES
+component servers.
