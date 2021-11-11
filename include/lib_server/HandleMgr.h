@@ -16,7 +16,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef Pointer HandleMgr_Handle_t;
+typedef void* HandleMgr_Handle_t;
 
 typedef struct HandleMgr
 {

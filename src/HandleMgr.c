@@ -7,18 +7,22 @@
 
 #define HANDLE_NOT_FOUND ((size_t) -1)
 
+// As we cast HandleMgr_Handle_t to Pointer in order to store it in a Vector
+// container then we should at the least grant size compatibility
+Debug_STATIC_ASSERT(sizeof(HandleMgr_Handle_t) == sizeof(Pointer));
+
 // Private functions -----------------------------------------------------------
 
 static size_t
 find(
     PointerVector* v,
-    const void*    h)
+    const HandleMgr_Handle_t h)
 {
     size_t sz = PointerVector_getSize(v);
 
     for (size_t i = 0; i < sz; i++)
     {
-        if (h == PointerVector_getElementAt(v, i))
+        if (h == (HandleMgr_Handle_t) PointerVector_getElementAt(v, i))
         {
             return i;
         }
@@ -89,7 +93,7 @@ HandleMgr_add(
         return OS_ERROR_OPERATION_DENIED;
     }
 
-    return !PointerVector_pushBack(&self->vector, handle) ?
+    return !PointerVector_pushBack(&self->vector, (Pointer) handle) ?
            OS_ERROR_INSUFFICIENT_SPACE : OS_SUCCESS;
 }
 
