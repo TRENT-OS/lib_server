@@ -24,8 +24,8 @@ typedef struct HandleMgr
 }
 HandleMgr_t;
 
-#define HandleMgr_GET_SIZE_BY_CAPACITY(capacity)\
-    PointerVector_GET_SIZE_BY_CAPACITY(capacity)
+#define HandleMgr_SIZE_OF_BUFFER(numItems)\
+    PointerVector_SIZE_OF_BUFFER(numItems)
 
 /**
  * @brief Initialize a handle manager instance
